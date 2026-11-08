@@ -1,14 +1,24 @@
+# Python 环境与缓存
 .venv/
 __pycache__/
 *.pyc
-logs/
 .pytest_cache/
-.fix_backup*/
 
-# 内部评审记录含本机路径，不公开
+# 本地运行产物与开发过程材料
+logs/
+.fix_backup*/
+.local-archive/
 docs/code_review_*.md
 
-# workspace 是运行产物目录：既有 AI 生成的图，也有用户自己的素材与成品
-# （相机原图、VMD 渲染、去背景结果等）。一律不进版本库，避免误传私人文件。
+# 用户素材与生成结果
 workspace/*
 !workspace/.gitkeep
+
+# 本地凭据
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx

@@ -135,7 +135,7 @@ gimp-console-3.2.exe --batch-interpreter=plug-in-script-fu-eval --batch "(plug-i
 - `duplicate_layer` 将副本放在源层同一父级、紧邻源层上方并选中；不会把底层副本直接置于整个图像最前面。半透明或特殊混合模式图层被复制后仍可能改变合成效果。
 - 日志初始化失败时不执行图像操作；操作完成后的日志记录异常不会将成功改报失败，返回值会附带 `warning`，不要因此重试图像操作。
 - GIMP 本地化会影响自动生成的图层名（如副本后缀、导入图层名），按名称操作图层时以 `get_image_info` 返回为准。
-- 协议与 PDB 过程名的实测依据见 `docs/protocol_notes.md`，逐工具进度见 `docs/progress.md`。
+- 协议与 PDB 兼容性说明见 `docs/protocol.md`。
 
 ## 目录结构
 
@@ -147,8 +147,8 @@ gimp-mcp/
 ├── config.py / config.json
 ├── tools/               # 按域分组的工具实现
 ├── tests/               # pytest（unit / headless / live）
-├── scripts/             # 协议探针、冒烟、端到端验收脚本
+├── scripts/             # 冒烟、端到端验收与 PDB 辅助脚本
 ├── workspace/           # 默认白名单目录
 ├── logs/                # 调用日志
-└── docs/                # protocol_notes.md / progress.md
+└── docs/                # 协议与兼容性说明
 ```

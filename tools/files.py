@@ -1,6 +1,6 @@
 """文件操作工具。
 
-PDB 依据（GIMP 3.2.6 实测调用成功，探针见 scripts/probe_fileops.py / probe_solve_export.py）：
+PDB 依据（GIMP 3.2.6 实测调用成功，兼容性说明见 docs/protocol.md）：
 - gimp-file-load：(run-mode path path) 3 参即可，返回 (image-id)
 - gimp-image-new：(width height base-type) 返回 (image-id)；新建图像无图层
 - gimp-layer-new：GIMP 3 签名为 (image name width height type opacity mode)（name 在第 2 位）

@@ -1,9 +1,9 @@
 """Script-Fu Server TCP 客户端（协议封装）。
 
-协议细节以本机 GIMP 3.2.6 实测为准，见 docs/protocol_notes.md：
+协议细节与 GIMP 3.2.6 兼容性说明见 docs/protocol.md：
   请求帧：0x47('G') + 2 字节大端长度 + UTF-8 脚本
   响应帧：0x47('G') + 1 字节错误码 + 2 字节大端长度 + UTF-8 文本
-socket 目标硬编码 127.0.0.1（安全要求，见任务书第 6 节）。
+socket 目标硬编码为 127.0.0.1，仅允许连接本机 GIMP。
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 """调色与滤镜工具。
 
-PDB 依据（GIMP 3.2.6 实测，探针 scripts/probe_adjust.py / probe_text.py）：
+PDB 依据（GIMP 3.2.6 实测，兼容性说明见 docs/protocol.md）：
 - 滤镜统一入口 gimp-drawable-merge-new-filter：(drawable "op" 0 LAYER-MODE-REPLACE 1.0 "key" val ...)
   - 亮度对比度 "gimp:brightness-contrast"：brightness/contrast 范围实测 -1.0–1.0（越界报错含范围文本）
   - 去色 "gimp:desaturate"："mode" DESATURATE-LIGHTNESS/LUMINOSITY/AVERAGE

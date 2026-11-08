@@ -1,4 +1,4 @@
-"""2026-10-26 / 2026-10-27 代码审查修复的回归测试（无头，不依赖 GIMP）。"""
+"""解析、连接、配置与文件安全的回归测试（无头，不依赖 GIMP）。"""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ class FakeClient:
 
 
 class TestLayerNameDelimiters:
-    """BUG-1：图层名含 , ; | = 等字符时 get_image_info 不得崩溃或截断。"""
+    """图层名含 , ; | = 等字符时 get_image_info 不得崩溃或截断。"""
 
     @pytest.mark.parametrize("name", [
         "Hello, world", "a;b", "a|b", "a=b", "Hello, world;|=混合",
@@ -89,7 +89,7 @@ class _ResetSocket(_ResponseSocket):
 
 
 class TestRetrySemantics:
-    """R02：只允许建连失败重试；一旦开始发送，任何通信失败都不得重放。"""
+    """只允许建连失败重试；一旦开始发送，任何通信失败都不得重放。"""
 
     def test_timeout_never_replays(self):
         client = GimpClient(reconnect_retries=3, reconnect_interval=0)
@@ -152,7 +152,7 @@ class TestRetrySemantics:
 
 
 class TestEmptyAllowedDirs:
-    """S-4：allowed_dirs 为空时应给出明确配置错误而非 IndexError。"""
+    """allowed_dirs 为空时应给出明确配置错误而非 IndexError。"""
 
     def test_empty_allowed_dirs(self):
         cfg = Config(allowed_dirs=[])
@@ -160,7 +160,7 @@ class TestEmptyAllowedDirs:
             cfg.resolve_allowed_dirs()
 
 
-# ---------- 2026-10-27 修复的回归 ----------
+# ---------- 发送开始后的连接失败与禁止重放 ----------
 
 
 class _ResetAfterSendSocket(_ResponseSocket):
@@ -181,7 +181,7 @@ class _ResetAfterSendSocket(_ResponseSocket):
 
 
 class TestNoReplayAfterSend:
-    """R02：sendall 开始后，无论发送还是接收失败，都不得自动重放。"""
+    """sendall 开始后，无论发送还是接收失败，都不得自动重放。"""
 
     @pytest.mark.parametrize("after_header", [False, True], ids=["header", "body"])
     @pytest.mark.parametrize("error", [
@@ -305,7 +305,7 @@ class TestSchemeStringEscapes:
 
 
 class TestNumNonFinite:
-    """S-14：inf/nan 必须在 Python 侧拒绝（科学计数法实测可被 TinyScheme 解析，不用管）。"""
+    """inf/nan 必须在 Python 侧拒绝，科学计数法保持原有格式。"""
 
     @pytest.mark.parametrize("bad", [float("inf"), float("-inf"), float("nan")])
     def test_rejected(self, bad):
@@ -321,7 +321,7 @@ class TestNumNonFinite:
 
 
 class TestConfigTypes:
-    """S-19：config.json 类型错误要在加载时给出明确错误。"""
+    """config.json 类型错误要在加载时给出明确错误。"""
 
     def _write(self, tmp_path, text):
         p = tmp_path / "config.json"
@@ -348,7 +348,7 @@ class TestConfigTypes:
 
 
 class TestUnknownExportExtension:
-    """S-13：白名单里配了没有导出实现的扩展名时，报错要可读，而不是裸 KeyError。"""
+    """白名单里配了没有导出实现的扩展名时，报错要可读，而不是裸 KeyError。"""
 
     def test_clear_value_error(self, tmp_path):
         from tools import files
@@ -359,7 +359,7 @@ class TestUnknownExportExtension:
 
 
 class TestLoggerRollover:
-    """S-16：日志文件名要跟着当前日期走，跨零点后不能继续写前一天的文件。"""
+    """日志文件名要跟着当前日期走，跨零点后不能继续写前一天的文件。"""
 
     def test_switches_file_when_date_changes(self, tmp_path, monkeypatch):
         from datetime import datetime as real_datetime

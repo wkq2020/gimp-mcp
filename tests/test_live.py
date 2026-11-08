@@ -340,11 +340,11 @@ class TestEscape:
             escape.run_scriptfu(live_client, CONFIG, "(+ 1 2)")
 
 
-# ---------- 2026-10-26 审查修复的 live 回归 ----------
+# ---------- 工具行为的 live 回归 ----------
 
-class TestReviewRegressions:
+class TestToolBehaviorRegressions:
     def test_layer_name_with_delimiters(self, fresh_image):
-        """BUG-1：add_text 文本含分隔符后 get_image_info 正常返回且名字完整。"""
+        """add_text 文本含分隔符后 get_image_info 正常返回且名字完整。"""
         client, _ = fresh_image
         text = "Hello, world;|="
         adjust.add_text(client, text)
@@ -356,7 +356,7 @@ class TestReviewRegressions:
         layers.remove_layer(client, "逗号,分号;竖线|")
 
     def test_new_image_white_with_black_background(self, live_client):
-        """BUG-4：context 背景为黑时 new_image 仍应产出白底。"""
+        """context 背景为黑时 new_image 仍应产出白底。"""
         live_client.eval("(gimp-context-set-background '(0 0 0))")
         try:
             files.new_image(live_client, 100, 60, "rgb")
@@ -364,27 +364,27 @@ class TestReviewRegressions:
             assert stats["mean"] == pytest.approx(255.0, abs=1.0)
         finally:
             live_client.eval("(gimp-context-set-background '(255 255 255))")
-    
+
     def test_scale_height_only_no_aspect(self, fresh_image):
-        """S-1：keep_aspect=False 且只给 height 时 width 保持不变。"""
+        """keep_aspect=False 且只给 height 时 width 保持不变。"""
         client, _ = fresh_image
         result = geometry.scale_image(client, height=90, keep_aspect=False)
         assert result["width"] == 320 and result["height"] == 90
 
     def test_crop_aspect_extreme_ratio(self, fresh_image):
-        """S-6：极端比例在小图上应给出明确错误。"""
+        """极端比例在小图上应给出明确错误。"""
         client, _ = fresh_image
         with pytest.raises(ValueError, match="不足 1 像素"):
             geometry.crop_to_aspect(client, 1, 10000)
 
     def test_quality_rejected_for_png(self, fresh_image):
-        """S-7：png 传 quality 应明确报错。"""
+        """png 传 quality 应明确报错。"""
         client, _ = fresh_image
         with pytest.raises(ValueError, match="仅对 jpeg/webp"):
             files.export_image(client, CONFIG, str(OUT / "q.png"), quality=80)
 
     def test_add_layer_grayscale_and_indexed(self, live_client):
-        """S-9：灰度/索引图像上添加图层。"""
+        """灰度/索引图像上添加图层。"""
         for mode in ("grayscale", "indexed"):
             files.new_image(live_client, 100, 60, mode)
             result = layers.add_layer(live_client, f"{mode}层")
@@ -394,14 +394,14 @@ class TestReviewRegressions:
             assert len(info["layers"]) == 2
 
     def test_preview_filenames_unique(self, live_client):
-        """S-5：同一图像连续两次预览不重名。"""
+        """同一图像连续两次预览不重名。"""
         files.new_image(live_client, 100, 60, "rgb")
         p1 = feedback.export_preview(live_client, CONFIG)
         p2 = feedback.export_preview(live_client, CONFIG)
         assert p1["path"] != p2["path"]
 
     def test_selection_restored_after_apply(self, fresh_image):
-        """S-3：selection_only=False 执行后原选区必须仍在。"""
+        """selection_only=False 执行后原选区必须仍在。"""
         client, img = fresh_image
         selection.select_rect(client, 0, 0, 50, 50)
         adjust.gaussian_blur(client, 5)
@@ -411,7 +411,7 @@ class TestReviewRegressions:
         assert empty == "0", "执行滤镜后选区丢失"
 
     def test_selection_restored_after_op_failure(self, fresh_image):
-        """S-3：op 在 GIMP 端失败时也要恢复选区、不残留 channel。"""
+        """op 在 GIMP 端失败时也要恢复选区、不残留 channel。"""
         client, img = fresh_image
         image_id = img["image_id"]
         selection.select_rect(client, 0, 0, 50, 50)
@@ -428,12 +428,12 @@ class TestReviewRegressions:
         assert empty == "0", "op 失败后选区未恢复"
 
 
-# ---------- 2026-10-27 审查修复的 live 回归 ----------
+# ---------- 选区与预览的 live 回归 ----------
 
 
-class TestFix20261027:
+class TestSelectionAndPreviewRegressions:
     def test_selection_only_targets_active_layer(self, fresh_image):
-        """BUG-5：活动图层不是最顶层时，selection_only 也只能改它，不能改顶层。"""
+        """活动图层不是最顶层时，selection_only 也只能改它，不能改顶层。"""
         client, img = fresh_image
         image_id = img["image_id"]
         selection.select_none(client)
@@ -453,7 +453,7 @@ class TestFix20261027:
         assert len(connection.get_image_info(client)["layers"]) == 2
 
     def test_export_preview_png_is_real_png(self, fresh_image):
-        """BUG-6：.png 预览必须真的是 PNG，而不是改了扩展名的 JPEG。"""
+        """.png 预览必须真的是 PNG，而不是改了扩展名的 JPEG。"""
         client, _ = fresh_image
         target = OUT / "preview.png"
         result = feedback.export_preview(client, CONFIG, str(target))
@@ -461,7 +461,7 @@ class TestFix20261027:
         assert result["width"] > 0 and result["height"] > 0
 
     def test_export_preview_failure_leaves_no_duplicate(self, fresh_image):
-        """BUG-7：预览导出失败也不能在 GIMP 里留下副本图像劫持后续调用。"""
+        """预览导出失败也不能在 GIMP 里留下副本图像劫持后续调用。"""
         client, img = fresh_image
         before = _image_count(client)
         target = OUT / "not_a_file.jpg"
@@ -475,18 +475,16 @@ class TestFix20261027:
         assert require_image(client) == img["image_id"]
 
     def test_no_layer_gives_readable_error(self, fresh_image):
-        """S-12：删光图层后要报可读错误，而不是 vector-ref 越界。"""
+        """删光图层后要报可读错误，而不是 vector-ref 越界。"""
         client, _ = fresh_image
         layers.remove_layer(client, "Background")
         with pytest.raises(ScriptFuError, match="没有选中的图层"):
             feedback.get_histogram_stats(client)
 
     def test_full_image_adjust_actually_applies_with_selection(self, fresh_image):
-        """BUG-15：有选区时 selection_only=False 也必须真的改像素，不能只恢复选区。
+        """有选区时 selection_only=False 仍须修改目标图层像素。
 
-        根因：gimp-selection-save 会把新建 channel 变成选中 drawable；
-        若等 op 执行时才求值 drawable，op 会打到临时 channel 上并随它一起被删。
-        原有 test_selection_restored_after_apply 只断言选区还在，测不出这个问题。
+        gimp-selection-save 会把新建 channel 变成选中 drawable，因此必须在保存选区前确定目标图层。
         """
         client, img = fresh_image
         image_id = img["image_id"]
@@ -500,7 +498,7 @@ class TestFix20261027:
         assert after > before, f"有选区时全图调整未生效: {before} -> {after}"
 
 
-class TestFix20261028:
+class TestExportAndPathRegressions:
     @pytest.mark.parametrize("extension", ["jpg", "webp"])
     def test_quality_changes_encoded_and_decoded_output(self, live_client, extension):
         import random
