@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+logs/
+.pytest_cache/
+.fix_backup*/
+
+# 内部评审记录含本机路径，不公开
+docs/code_review_*.md
+
+# workspace 是运行产物目录：既有 AI 生成的图，也有用户自己的素材与成品
+# （相机原图、VMD 渲染、去背景结果等）。一律不进版本库，避免误传私人文件。
+workspace/*
+!workspace/.gitkeep

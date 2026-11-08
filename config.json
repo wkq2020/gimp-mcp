@@ -1,0 +1,11 @@
+{
+  "port": 10008,
+  "timeout_seconds": 60,
+  "reconnect_retries": 3,
+  "reconnect_interval_seconds": 2,
+  "allowed_dirs": ["workspace"],
+  "allowed_export_extensions": ["png", "jpg", "jpeg", "webp", "tiff", "gif", "xcf"],
+  "enable_scriptfu_escape_hatch": false,
+  "preview_max_side": 1024,
+  "log_dir": "logs"
+}
